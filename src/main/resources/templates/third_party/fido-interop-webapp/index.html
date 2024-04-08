@@ -289,6 +289,7 @@
         window.base64url = methods;
       }
     }
+    console.log('ingee~~~')
   })();
 </script>
 <script>
@@ -461,7 +462,11 @@
 
   let getChallenge = (attestationOrAssertion, formBody) => {
     /* ----- DO NOT MODIFY THIS CODE ----- */
-    return fetch(`${serverURL}/${attestationOrAssertion}/options`, {
+    // return fetch(`${serverURL}/${attestationOrAssertion}/options`, {
+    const apiUrl = `${serverURL}/${attestationOrAssertion}/options`
+    console.log('ingee:getChallenge: apiUrl=', apiUrl)
+    console.log('ingee:getChallenge: formBody=', JSON.stringify(formBody))
+    return fetch(apiUrl, {
       method: 'POST',
       credentials: 'include',
       headers: {
@@ -480,7 +485,11 @@
 
   let sendWebAuthnResponse = (attestationOrAssertion, formBody) => {
     /* ----- DO NOT MODIFY THIS CODE ----- */
-    return fetch(`${serverURL}/${attestationOrAssertion}/result`, {
+    //return fetch(`${serverURL}/${attestationOrAssertion}/result`, {
+    const apiUrl = `${serverURL}/${attestationOrAssertion}/result`
+    console.log('ingee:sendWebAuthnResponse: apiUrl=', apiUrl)
+    console.log('ingee:sendWebAuthnResponse: formBody=', JSON.stringify(formBody))
+    return fetch(apiUrl, {
       method: 'POST',
       credentials: 'include',
       headers: {
@@ -593,14 +602,23 @@
     },
     'getAssertionRK': () => {
       /* ----- DO NOT MODIFY THIS CODE ----- */
+      username = 'someone@localhost'
+      displayName = 'Someone'
       return getChallenge('assertion', {displayName, username})
       .then((response) => {
+        console.log('ingee:getAssertionRK: response=', response)
         let publicKey = preformatGetAssertReq(response);
+        console.log('ingee:getAssertionRK: publicKey=', publicKey)
         publicKey = {'challenge': publicKey.challenge, 'rpId': publicKey.rpId}
-        return navigator.credentials.get({ publicKey })
+        console.log('ingee:getAssertionRK: modified-publicKey=', publicKey)
+        const rslt = navigator.credentials.get({ publicKey })
+        console.log('ingee:getAssertionRK: return=', rslt)
+        return rslt
       })
       .then((response) => {
+        console.log('ingee:getAssertionRK:2: response=', response)
         let makeCredResponse = publicKeyCredentialToJSON(response);
+        console.log('ingee:getAssertionRK:2: makeCredResponse=', makeCredResponse)
         return sendWebAuthnResponse('assertion', makeCredResponse)
       })
     },
@@ -690,14 +708,28 @@
         'requireResidentKey': true
       }
 
-      return getChallenge('attestation', {displayName, username, attestation, authenticatorSelection})
+      username = 'someone@localhost'
+      displayName = 'Someone'
+      console.log('username=', username)
+      // return getChallenge('attestation', {displayName, username, attestation, authenticatorSelection})
+      const formBody = {displayName, username, attestation, authenticatorSelection}
+      console.log('formBody=', formBody)
+      return getChallenge('attestation', formBody)
       .then((response) => {
+        console.log('ingee:makeCredentialRKPlatform: response=', response)
         let publicKey = preformatMakeCredReq(response);
-        return navigator.credentials.create({ publicKey })
+        console.log('ingee:makeCredentialRKPlatform: publicKey=', publicKey)
+        const rslt = navigator.credentials.create({ publicKey })
+        console.log('ingee:makeCredentialRKPlatform: rslt=', rslt)
+        return rslt
       })
       .then((response) => {
+        console.log('ingee:makeCredentialRKPlatform2: response=', response)
         let makeCredResponse = publicKeyCredentialToJSON(response);
-        return sendWebAuthnResponse('attestation', makeCredResponse)
+        console.log('ingee:makeCredentialRKPlatform2: makeCredResponse=', makeCredResponse)
+        const rslt = sendWebAuthnResponse('attestation', makeCredResponse)
+        console.log('ingee:makeCredentialRKPlatform2: rslt=', rslt)
+        return rslt
       })
     }
     /* ----- VENDORS AREA ----- */
