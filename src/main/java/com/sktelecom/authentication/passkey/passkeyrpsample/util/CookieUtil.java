@@ -16,6 +16,8 @@
 
 package com.sktelecom.authentication.passkey.passkeyrpsample.util;
 
+import org.springframework.http.HttpHeaders;
+
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletResponse;
 
@@ -24,7 +26,8 @@ public class CookieUtil {
     }
 
     public static void addCookie(HttpServletResponse response, String name, String value) {
-        Cookie cookie = new Cookie(name, value);
-        response.addCookie(cookie);
+        // Cookie cookie = new Cookie(name, value);
+        // response.addCookie(cookie);
+        response.setHeader(HttpHeaders.SET_COOKIE, String.format("%s=%s; SameSite=None; Secure", name, value));
     }
 }
